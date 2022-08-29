@@ -14,9 +14,25 @@
 #define START_PIO_IDX		31
 #define START_PIO_IDX_MASK	(1u << START_PIO_IDX)
 
+#define SELECAO_PIO			 PIOD
+#define SELECAO_PIO_ID		 ID_PIOD
+#define SELECAO_PIO_IDX		 28
+#define SELECAO_PIO_IDX_MASK (1u << SELECAO_PIO_IDX)
+
+/************************************************************************/
+/* prototypes                                                           */
+/************************************************************************/
+
+void init(void);
+void set_buzzer(void);
+void clear_buzzer(void);
+int get_startstop(void);
+int get_selecao(void);
+
+
 void set_buzzer()
 {
-	BUZZ_PIO->PIO_SODR = BUZZ_PIO_IDX_MASK;_
+	BUZZ_PIO->PIO_SODR = BUZZ_PIO_IDX_MASK;
 }
 
 void clear_buzzer()
@@ -29,12 +45,24 @@ int get_startstop()
 {
 	uint32_t status;
 	Pio *p_pio = START_PIO;
-	status = PIO_ODSR;
-	ul_mask = START_PIO_IDX_MASK;
+	status = p_pio->PIO_ODSR;
 	
-	if(status && ul_mask == 0){
+	if(status && START_PIO_IDX_MASK == 0){
 		return 0;
-	}else{
+	} else {
+		return 1;
+	}
+}
+
+int get_selecao()
+{
+	uint32_t status;
+	Pio *p_pio = SELECAO_PIO;
+	status = p_pio->PIO_ODSR;
+	
+	if(status && SELECAO_PIO_IDX_MASK == 0){
+		return 0;
+		} else {
 		return 1;
 	}
 }
@@ -52,7 +80,10 @@ void init(void){
 		pio_set_output(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 0, 0, 0);
 		
 		//START BUTTON
-		pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_DEFAULT)
+		pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_DEFAULT);
+		
+		//SELEÇÃO BUTTON
+		pio_set_input(SELECAO_PIO, SELECAO_PIO_IDX_MASK, PIO_DEFAULT);
 		
 		
 			
