@@ -9,15 +9,34 @@
 #define BUZZ_PIO_IDX			19
 #define BUZZ_PIO_IDX_MASK	(1 << BUZZ_PIO_IDX)
 
-void set_buzzer(Pio *p_pio, const uint32_t ul_mask)
+#define START_PIO			PIOC
+#define START_PIO_ID		ID_PIOC
+#define START_PIO_IDX		31
+#define START_PIO_IDX_MASK	(1u << START_PIO_IDX)
+
+void set_buzzer()
 {
-	
-	p_pio->PIO_SODR = ul_mask;_
+	BUZZ_PIO->PIO_SODR = BUZZ_PIO_IDX_MASK;_
 }
 
-void clear_buzzer(Pio *p_pio, const uint32_t ul_mask)
+void clear_buzzer()
 {
-	p_pio->PIO_CODR = ul_mask;
+	BUZZ_PIO->PIO_CODR =  BUZZ_PIO_IDX_MASK;
+}
+
+
+int get_startstop()
+{
+	uint32_t status;
+	Pio *p_pio = START_PIO;
+	status = PIO_ODSR;
+	ul_mask = START_PIO_IDX_MASK;
+	
+	if(status && ul_mask == 0){
+		return 0;
+	}else{
+		return 1;
+	}
 }
 
 void init(void){
@@ -29,11 +48,14 @@ void init(void){
 		
 		pmc_enable_periph_clk(ID_PIOC);
 		
+		//BUZZER
 		pio_set_output(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 0, 0, 0);
 		
+		//START BUTTON
+		pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_DEFAULT)
 		
 		
-		
+			
 		
 }
 
