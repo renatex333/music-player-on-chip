@@ -28,6 +28,7 @@ void set_buzzer(void);
 void clear_buzzer(void);
 int get_startstop(void);
 int get_selecao(void);
+void buzzer_test(int);
 
 
 void set_buzzer()
@@ -90,6 +91,14 @@ void init(void){
 		
 }
 
+void buzzer_test(int freq)
+{
+	set_buzzer();
+	delay_ms(1000/freq);
+	clear_buzzer();
+	delay_ms(1000/freq);
+}
+
 int main (void)
 {
 	init();
@@ -104,7 +113,8 @@ int main (void)
 	
 	
   /* Insert application code here, after the board has been initialized. */
+	//buzzer_test(440);
 	while(1) {
-
+		buzzer_test(440);
 	}
 }
