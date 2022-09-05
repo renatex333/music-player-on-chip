@@ -131,7 +131,10 @@ void startstop_callback(void);
 /* variaveis globais e flags                                            */
 /************************************************************************/
 
-volatile char startstop_flag;
+volatile int stop = 0;
+
+volatile char buzz_flag;
+volatile char stop_flag;
 volatile char selecao_flag;
 
 /************************************************************************/
@@ -140,7 +143,7 @@ volatile char selecao_flag;
 
 void startstop_callback(void)
 {
-	startstop_flag = 1;
+	stop_flag = 1;
 }
 
 void selecao_callback(void)
@@ -148,6 +151,10 @@ void selecao_callback(void)
 	selecao_flag = 1;
 }
 
+void buzz_callback(void)
+{
+	buzz_flag = 1;
+}
 /************************************************************************/
 /* Criando as structs                                                   */
 /************************************************************************/
@@ -260,6 +267,9 @@ void init(void){
 		
 		//BUZZER
 		pio_set_output(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 0, 0, 0);
+
+		pio_configure(BUZZ_PIO, PIO_OUTPUT_0, BUZZ_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
+		pio_set_debounce_filter(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 60);
 		
 		//START BUTTON
 		pio_configure(START_PIO, PIO_INPUT, START_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
@@ -270,10 +280,17 @@ void init(void){
 		pio_set_debounce_filter(SELECAO_PIO, SELECAO_PIO_IDX_MASK, 120);
 		
 		// associacao callback
+
+		pio_handler_set(BUZZ_PIO,
+						BUZZ_PIO_IDX,
+						BUZZ_PIO_IDX_MASK,
+						PIO_IT_FALL_EDGE,
+						buzz_callback);
+
 		pio_handler_set(START_PIO,
 						START_PIO_IDX,
 						START_PIO_IDX_MASK,
-						PIO_IT_EDGE,
+						PIO_IT_FALL_EDGE,
 						startstop_callback);
 		
 		pio_handler_set(SELECAO_PIO,
@@ -283,6 +300,9 @@ void init(void){
 						selecao_callback);
 		
 		// ativa interrupcao e limpa primeira IRQ
+		pio_enable_interrupt(BUZZ_PIO, BUZZ_PIO_IDX_MASK);
+		pio_get_interrupt_status(BUZZ_PIO);
+
 		pio_enable_interrupt(START_PIO, START_PIO_IDX_MASK);
 		pio_get_interrupt_status(START_PIO);
 		
@@ -290,6 +310,9 @@ void init(void){
 		pio_get_interrupt_status(SELECAO_PIO);
 		
 		// configuracao NVIC
+		NVIC_EnableIRQ(BUZZ_PIO_ID);
+		NVIC_SetPriority(BUZZ_PIO_ID, 8);
+
 		NVIC_EnableIRQ(START_PIO_ID);
 		NVIC_SetPriority(START_PIO_ID, 6);
 		
@@ -319,7 +342,7 @@ int main (void)
 		// iterate over the notes of the melody.
 		// Remember, the array is twice the number of notes (notes + durations)
 		
-		
+			
 			for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
 				// calculates the duration of each note
 				divider = melody[thisNote + 1];
@@ -327,12 +350,13 @@ int main (void)
 				if (divider < 0) {
 					noteDuration *= 1.5; // increases the duration in half for dotted notes
 				}
-
+				
 				// we only play the note for 90% of the duration, leaving 10% as a pause
 				tone(melody[thisNote], noteDuration * 0.9);
 
 				// Wait for the specief duration before playing the next note.
 				delay_ms(noteDuration * 0.1);
+				
 		}
 
 		}
