@@ -29,6 +29,7 @@ void clear_buzzer(void);
 int get_startstop(void);
 int get_selecao(void);
 void buzzer_test(int);
+void tone(int, int);
 
 
 void set_buzzer()
@@ -94,10 +95,21 @@ void init(void){
 void buzzer_test(int freq)
 {
 	set_buzzer();
-	delay_ms(1000/freq);
+	delay_us(1000000/freq);
 	clear_buzzer();
-	delay_ms(1000/freq);
+	delay_us(1000000/freq);
 }
+
+/**
+ * freq: Frequecia em Hz
+ * time: Tempo em ms que o tom deve ser gerado
+ */
+void tone(int freq, int time){
+	for(int i = 0; i < (time*freq)/2; i++){
+		buzzer_test(freq);
+	}
+}
+
 
 int main (void)
 {
@@ -115,6 +127,9 @@ int main (void)
   /* Insert application code here, after the board has been initialized. */
 	//buzzer_test(440);
 	while(1) {
-		buzzer_test(440);
+		for (int freq=200; freq<5000; freq+=500){
+			tone(freq, 5);
+			delay_ms(200);
+		}
 	}
 }
