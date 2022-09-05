@@ -125,6 +125,29 @@ int get_selecao(void);
 void buzzer_test(int);
 void tone(int, int);
 
+void startstop_callback(void);
+
+/************************************************************************/
+/* variaveis globais e flags                                            */
+/************************************************************************/
+
+volatile char startstop_flag;
+volatile char selecao_flag;
+
+/************************************************************************/
+/* handler / callbacks                                                  */
+/************************************************************************/
+
+void startstop_callback(void)
+{
+	startstop_flag = 1;
+}
+
+void selecao_callback(void)
+{
+	selecao_flag = 1;
+}
+
 /************************************************************************/
 /* Criando as structs                                                   */
 /************************************************************************/
@@ -142,172 +165,32 @@ typedef struct {
 	
 } song;
 
+int melody[] = {
 
-song jigglypuf;
-jigglypuf.tempo = 85;
-
-jigglypuf.melody = {
-
-	// Jigglypuff's Song
-	// Score available at https://musescore.com/user/28109683/scores/5044153
-	
-	NOTE_D5,-4, NOTE_A5,8, NOTE_FS5,8, NOTE_D5,8,
-	NOTE_E5,-4, NOTE_FS5,8, NOTE_G5,4,
-	NOTE_FS5,-4, NOTE_E5,8, NOTE_FS5,4,
-	NOTE_D5,-2,
-	NOTE_D5,-4, NOTE_A5,8, NOTE_FS5,8, NOTE_D5,8,
-	NOTE_E5,-4, NOTE_FS5,8, NOTE_G5,4,
-	NOTE_FS5,-1,
-	NOTE_D5,-4, NOTE_A5,8, NOTE_FS5,8, NOTE_D5,8,
-	NOTE_E5,-4, NOTE_FS5,8, NOTE_G5,4,
-	
-	NOTE_FS5,-4, NOTE_E5,8, NOTE_FS5,4,
-	NOTE_D5,-2,
-	NOTE_D5,-4, NOTE_A5,8, NOTE_FS5,8, NOTE_D5,8,
-	NOTE_E5,-4, NOTE_FS5,8, NOTE_G5,4,
-	NOTE_FS5,-1,
-	
+  // Jigglypuff's Song
+  // Score available at https://musescore.com/user/28109683/scores/5044153
+  
+  NOTE_D5,-4, NOTE_A5,8, NOTE_FS5,8, NOTE_D5,8,
+  NOTE_E5,-4, NOTE_FS5,8, NOTE_G5,4,
+  NOTE_FS5,-4, NOTE_E5,8, NOTE_FS5,4,
+  NOTE_D5,-2,
+  NOTE_D5,-4, NOTE_A5,8, NOTE_FS5,8, NOTE_D5,8,
+  NOTE_E5,-4, NOTE_FS5,8, NOTE_G5,4,
+  NOTE_FS5,-1,
+  NOTE_D5,-4, NOTE_A5,8, NOTE_FS5,8, NOTE_D5,8,
+  NOTE_E5,-4, NOTE_FS5,8, NOTE_G5,4,
+  
+  NOTE_FS5,-4, NOTE_E5,8, NOTE_FS5,4,
+  NOTE_D5,-2,
+  NOTE_D5,-4, NOTE_A5,8, NOTE_FS5,8, NOTE_D5,8,
+  NOTE_E5,-4, NOTE_FS5,8, NOTE_G5,4,
+  NOTE_FS5,-1,
+  
 };
 
-song nevergonnagiveyouup;
-nevergonnagiveyouup.tempo = 114;
-
-nevergonnagiveyouup.melody = {
-
-	// Never Gonna Give You Up - Rick Astley
-	// Score available at https://musescore.com/chlorondria_5/never-gonna-give-you-up_alto-sax
-	// Arranged by Chlorondria
-
-	NOTE_D5,-4, NOTE_E5,-4, NOTE_A4,4, //1
-	NOTE_E5,-4, NOTE_FS5,-4, NOTE_A5,16, NOTE_G5,16, NOTE_FS5,8,
-	NOTE_D5,-4, NOTE_E5,-4, NOTE_A4,2,
-	NOTE_A4,16, NOTE_A4,16, NOTE_B4,16, NOTE_D5,8, NOTE_D5,16,
-	NOTE_D5,-4, NOTE_E5,-4, NOTE_A4,4, //repeat from 1
-	NOTE_E5,-4, NOTE_FS5,-4, NOTE_A5,16, NOTE_G5,16, NOTE_FS5,8,
-	NOTE_D5,-4, NOTE_E5,-4, NOTE_A4,2,
-	NOTE_A4,16, NOTE_A4,16, NOTE_B4,16, NOTE_D5,8, NOTE_D5,16,
-	REST,4, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_D5,8, NOTE_E5,8, NOTE_CS5,-8,
-	NOTE_B4,16, NOTE_A4,2, REST,4,
-
-	REST,8, NOTE_B4,8, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_B4,4, NOTE_A4,8, //7
-	NOTE_A5,8, REST,8, NOTE_A5,8, NOTE_E5,-4, REST,4,
-	NOTE_B4,8, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_B4,8, NOTE_D5,8, NOTE_E5,8, REST,8,
-	REST,8, NOTE_CS5,8, NOTE_B4,8, NOTE_A4,-4, REST,4,
-	REST,8, NOTE_B4,8, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_B4,8, NOTE_A4,4,
-	NOTE_E5,8, NOTE_E5,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,4, REST,4,
-	
-	NOTE_D5,2, NOTE_E5,8, NOTE_FS5,8, NOTE_D5,8, //13
-	NOTE_E5,8, NOTE_E5,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,4, NOTE_A4,4,
-	REST,2, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_B4,8,
-	REST,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,-4, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_FS5,-8, NOTE_FS5,-8, NOTE_E5,-4, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-
-	NOTE_E5,-8, NOTE_E5,-8, NOTE_D5,-8, NOTE_CS5,16, NOTE_B4,-8, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16, //18
-	NOTE_D5,4, NOTE_E5,8, NOTE_CS5,-8, NOTE_B4,16, NOTE_A4,8, NOTE_A4,8, NOTE_A4,8,
-	NOTE_E5,4, NOTE_D5,2, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_FS5,-8, NOTE_FS5,-8, NOTE_E5,-4, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_A5,4, NOTE_CS5,8, NOTE_D5,-8, NOTE_CS5,16, NOTE_B4,8, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-
-	NOTE_D5,4, NOTE_E5,8, NOTE_CS5,-8, NOTE_B4,16, NOTE_A4,4, NOTE_A4,8,  //23
-	NOTE_E5,4, NOTE_D5,2, REST,4,
-	REST,8, NOTE_B4,8, NOTE_D5,8, NOTE_B4,8, NOTE_D5,8, NOTE_E5,4, REST,8,
-	REST,8, NOTE_CS5,8, NOTE_B4,8, NOTE_A4,-4, REST,4,
-	REST,8, NOTE_B4,8, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_B4,8, NOTE_A4,4,
-	REST,8, NOTE_A5,8, NOTE_A5,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,8, NOTE_D5,8,
-	
-	REST,8, NOTE_A4,8, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_B4,8, //29
-	REST,8, NOTE_CS5,8, NOTE_B4,8, NOTE_A4,-4, REST,4,
-	NOTE_B4,8, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_B4,8, NOTE_A4,4, REST,8,
-	REST,8, NOTE_E5,8, NOTE_E5,8, NOTE_FS5,4, NOTE_E5,-4,
-	NOTE_D5,2, NOTE_D5,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,4,
-	NOTE_E5,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,8, NOTE_A4,8, NOTE_A4,4,
-
-	REST,-4, NOTE_A4,8, NOTE_B4,8, NOTE_CS5,8, NOTE_D5,8, NOTE_B4,8, //35
-	REST,8, NOTE_E5,8, NOTE_FS5,8, NOTE_E5,-4, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_FS5,-8, NOTE_FS5,-8, NOTE_E5,-4, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_E5,-8, NOTE_E5,-8, NOTE_D5,-8, NOTE_CS5,16, NOTE_B4,8, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_D5,4, NOTE_E5,8, NOTE_CS5,-8, NOTE_B4,16, NOTE_A4,4, NOTE_A4,8,
-
-	NOTE_E5,4, NOTE_D5,2, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16, //40
-	NOTE_FS5,-8, NOTE_FS5,-8, NOTE_E5,-4, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_A5,4, NOTE_CS5,8, NOTE_D5,-8, NOTE_CS5,16, NOTE_B4,8, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_D5,4, NOTE_E5,8, NOTE_CS5,-8, NOTE_B4,16, NOTE_A4,4, NOTE_A4,8,
-	NOTE_E5,4, NOTE_D5,2, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	
-	NOTE_FS5,-8, NOTE_FS5,-8, NOTE_E5,-4, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16, //45
-	NOTE_A5,4, NOTE_CS5,8, NOTE_D5,-8, NOTE_CS5,16, NOTE_B4,8, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_D5,4, NOTE_E5,8, NOTE_CS5,-8, NOTE_B4,16, NOTE_A4,4, NOTE_A4,8,
-	NOTE_E5,4, NOTE_D5,2, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_FS5,-8, NOTE_FS5,-8, NOTE_E5,-4, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16, //45
-	
-	NOTE_A5,4, NOTE_CS5,8, NOTE_D5,-8, NOTE_CS5,16, NOTE_B4,8, NOTE_A4,16, NOTE_B4,16, NOTE_D5,16, NOTE_B4,16,
-	NOTE_D5,4, NOTE_E5,8, NOTE_CS5,-8, NOTE_B4,16, NOTE_A4,4, NOTE_A4,8,
-
-	NOTE_E5,4, NOTE_D5,2, REST,4
-};
-
-song gameofthrones;
-gameofthrones.tempo = 85;
-
-gameofthrones.melody = {
-
-	// Game of Thrones
-	// Score available at https://musescore.com/user/8407786/scores/2156716
-
-	NOTE_G4,8, NOTE_C4,8, NOTE_DS4,16, NOTE_F4,16, NOTE_G4,8, NOTE_C4,8, NOTE_DS4,16, NOTE_F4,16, //1
-	NOTE_G4,8, NOTE_C4,8, NOTE_DS4,16, NOTE_F4,16, NOTE_G4,8, NOTE_C4,8, NOTE_DS4,16, NOTE_F4,16,
-	NOTE_G4,8, NOTE_C4,8, NOTE_E4,16, NOTE_F4,16, NOTE_G4,8, NOTE_C4,8, NOTE_E4,16, NOTE_F4,16,
-	NOTE_G4,8, NOTE_C4,8, NOTE_E4,16, NOTE_F4,16, NOTE_G4,8, NOTE_C4,8, NOTE_E4,16, NOTE_F4,16,
-	NOTE_G4,-4, NOTE_C4,-4,//5
-
-	NOTE_DS4,16, NOTE_F4,16, NOTE_G4,4, NOTE_C4,4, NOTE_DS4,16, NOTE_F4,16, //6
-	NOTE_D4,-1, //7 and 8
-	NOTE_F4,-4, NOTE_AS3,-4,
-	NOTE_DS4,16, NOTE_D4,16, NOTE_F4,4, NOTE_AS3,-4,
-	NOTE_DS4,16, NOTE_D4,16, NOTE_C4,-1, //11 and 12
-
-	//repeats from 5
-	NOTE_G4,-4, NOTE_C4,-4,//5
-
-	NOTE_DS4,16, NOTE_F4,16, NOTE_G4,4, NOTE_C4,4, NOTE_DS4,16, NOTE_F4,16, //6
-	NOTE_D4,-1, //7 and 8
-	NOTE_F4,-4, NOTE_AS3,-4,
-	NOTE_DS4,16, NOTE_D4,16, NOTE_F4,4, NOTE_AS3,-4,
-	NOTE_DS4,16, NOTE_D4,16, NOTE_C4,-1, //11 and 12
-	NOTE_G4,-4, NOTE_C4,-4,
-	NOTE_DS4,16, NOTE_F4,16, NOTE_G4,4,  NOTE_C4,4, NOTE_DS4,16, NOTE_F4,16,
-
-	NOTE_D4,-2,//15
-	NOTE_F4,-4, NOTE_AS3,-4,
-	NOTE_D4,-8, NOTE_DS4,-8, NOTE_D4,-8, NOTE_AS3,-8,
-	NOTE_C4,-1,
-	NOTE_C5,-2,
-	NOTE_AS4,-2,
-	NOTE_C4,-2,
-	NOTE_G4,-2,
-	NOTE_DS4,-2,
-	NOTE_DS4,-4, NOTE_F4,-4,
-	NOTE_G4,-1,
-	
-	NOTE_C5,-2,//28
-	NOTE_AS4,-2,
-	NOTE_C4,-2,
-	NOTE_G4,-2,
-	NOTE_DS4,-2,
-	NOTE_DS4,-4, NOTE_D4,-4,
-	NOTE_C5,8, NOTE_G4,8, NOTE_GS4,16, NOTE_AS4,16, NOTE_C5,8, NOTE_G4,8, NOTE_GS4,16, NOTE_AS4,16,
-	NOTE_C5,8, NOTE_G4,8, NOTE_GS4,16, NOTE_AS4,16, NOTE_C5,8, NOTE_G4,8, NOTE_GS4,16, NOTE_AS4,16,
-	
-	REST,4, NOTE_GS5,16, NOTE_AS5,16, NOTE_C6,8, NOTE_G5,8, NOTE_GS5,16, NOTE_AS5,16,
-	NOTE_C6,8, NOTE_G5,16, NOTE_GS5,16, NOTE_AS5,16, NOTE_C6,8, NOTE_G5,8, NOTE_GS5,16, NOTE_AS5,16,
-};
-	
-
-
-
-
-
-
+/************************************************************************/
+/* FunÃ§Ãµes                                                              */
+/************************************************************************/
 
 void set_buzzer()
 {
@@ -346,29 +229,6 @@ int get_selecao()
 	}
 }
 
-void init(void){
-		board_init();
-		sysclk_init();
-		delay_init();
-		
-		WDT->WDT_MR = WDT_MR_WDDIS;
-		
-		pmc_enable_periph_clk(ID_PIOC);
-		
-		//BUZZER
-		pio_set_output(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 0, 0, 0);
-		
-		//START BUTTON
-		pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_DEFAULT);
-		
-		//SELEÇÃO BUTTON
-		pio_set_input(SELECAO_PIO, SELECAO_PIO_IDX_MASK, PIO_DEFAULT);
-		
-		
-			
-		
-}
-
 void buzzer_test(int freq)
 {
 	set_buzzer();
@@ -386,24 +246,63 @@ void tone(int freq, int time){
 	for(int i = 0; i < (int) duracao; i++){
 		buzzer_test(freq);
 	}
-	
-	
-	/*
-	float p = ((1.0/freq)/2.0)*1000000;
-	int duracao = (time * 1000000)/(p * 2);
-	for(int i = 0; i < duracao; i++){
-		set_buzzer();
-		delay_us(p);
-		clear_buzzer();
-		delay_us(p);
-	}
-	*/
+}
+
+
+void init(void){
+		board_init();
+		sysclk_init();
+		delay_init();
+		
+		WDT->WDT_MR = WDT_MR_WDDIS;
+		
+		pmc_enable_periph_clk(ID_PIOC);
+		
+		//BUZZER
+		pio_set_output(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 0, 0, 0);
+		
+		//START BUTTON
+		pio_configure(START_PIO, PIO_INPUT, START_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
+		pio_set_debounce_filter(START_PIO, START_PIO_IDX_MASK, 60);
+		
+		//SELEï¿½ï¿½O BUTTON
+		pio_configure(SELECAO_PIO, PIO_INPUT, SELECAO_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
+		pio_set_debounce_filter(SELECAO_PIO, SELECAO_PIO_IDX_MASK, 120);
+		
+		// associacao callback
+		pio_handler_set(START_PIO,
+						START_PIO_IDX,
+						START_PIO_IDX_MASK,
+						PIO_IT_EDGE,
+						startstop_callback);
+		
+		pio_handler_set(SELECAO_PIO,
+						SELECAO_PIO_ID,
+						SELECAO_PIO_IDX_MASK,
+						PIO_IT_EDGE,
+						selecao_callback);
+		
+		// ativa interrupcao e limpa primeira IRQ
+		pio_enable_interrupt(START_PIO, START_PIO_IDX_MASK);
+		pio_get_interrupt_status(START_PIO);
+		
+		pio_enable_interrupt(SELECAO_PIO, SELECAO_PIO_IDX_MASK);
+		pio_get_interrupt_status(SELECAO_PIO);
+		
+		// configuracao NVIC
+		NVIC_EnableIRQ(START_PIO_ID);
+		NVIC_SetPriority(START_PIO_ID, 6);
+		
+		NVIC_EnableIRQ(SELECAO_PIO_ID);
+		NVIC_SetPriority(SELECAO_PIO_ID, 2);	
 }
 
 
 int main (void)
 {
 	init();
+
+	int tempo = 85;
 		
 	// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 	// there are two values per note (pitch and duration), so for each note there are four bytes
@@ -416,36 +315,26 @@ int main (void)
 
 	int noteDuration = 0;
 	
-	
-	
-
-	// Init OLED
-	//gfx_mono_ssd1306_init();
-  
-  // Escreve na tela um circulo e um texto
-	//gfx_mono_draw_filled_circle(20, 16, 16, GFX_PIXEL_SET, GFX_WHOLE);
-	//gfx_mono_draw_string("mundo", 50,16, &sysfont);
-	
-	
-  /* Insert application code here, after the board has been initialized. */
-	//buzzer_test(440);
 	while(1) {
 		// iterate over the notes of the melody.
 		// Remember, the array is twice the number of notes (notes + durations)
-		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+		
+		
+			for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+				// calculates the duration of each note
+				divider = melody[thisNote + 1];
+				noteDuration = (wholenote) / abs(divider);
+				if (divider < 0) {
+					noteDuration *= 1.5; // increases the duration in half for dotted notes
+				}
 
-			// calculates the duration of each note
-			divider = melody[thisNote + 1];
-			noteDuration = (wholenote) / abs(divider);
-			if (divider < 0) {
-				noteDuration *= 1.5; // increases the duration in half for dotted notes
-			}
+				// we only play the note for 90% of the duration, leaving 10% as a pause
+				tone(melody[thisNote], noteDuration * 0.9);
 
-			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone(melody[thisNote], noteDuration * 0.9);
-
-			// Wait for the specief duration before playing the next note.
-			delay_ms(noteDuration * 0.1);
+				// Wait for the specief duration before playing the next note.
+				delay_ms(noteDuration * 0.1);
 		}
-	}
+
+		}
+		
 }
