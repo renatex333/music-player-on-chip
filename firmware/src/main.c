@@ -228,6 +228,7 @@ int melody[] = {
 
 
 
+
 void set_buzzer()
 {
 	BUZZ_PIO->PIO_SODR = BUZZ_PIO_IDX_MASK;
@@ -301,8 +302,8 @@ void buzzer_test(int freq)
  * time: Tempo em ms que o tom deve ser gerado
  */
 void tone(int freq, int time){
-	double duracao = (time*1000)/freq;
-	for(int i = 0; i < duracao; i++){
+	double duracao = (time*freq)/(1000);
+	for(int i = 0; i < (int) duracao; i++){
 		buzzer_test(freq);
 	}
 	
@@ -372,9 +373,6 @@ int main (void)
 
 			// Wait for the specief duration before playing the next note.
 			delay_ms(noteDuration * 0.1);
-
-			// stop the waveform generation before the next note.
-			// noTone(buzzer);
 		}
 	}
 }
