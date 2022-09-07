@@ -126,6 +126,36 @@ void buzzer_test(int);
 void buzzer_play(double);
 void tone(int, int);
 
+void startstop_callback(void);
+
+/************************************************************************/
+/* variaveis globais e flags                                            */
+/************************************************************************/
+
+volatile int stop = 0;
+
+volatile char buzz_flag;
+volatile char stop_flag;
+volatile char selecao_flag;
+
+/************************************************************************/
+/* handler / callbacks                                                  */
+/************************************************************************/
+
+void startstop_callback(void)
+{
+	stop_flag = 1;
+}
+
+void selecao_callback(void)
+{
+	selecao_flag = 1;
+}
+
+void buzz_callback(void)
+{
+	buzz_flag = 1;
+}
 /************************************************************************/
 /* Criando as structs                                                   */
 /************************************************************************/
@@ -142,6 +172,10 @@ typedef struct  {
 	int melody[250];
 	
 } song;
+
+/************************************************************************/
+/* FunÃ§Ãµes                                                              */
+/************************************************************************/
 
 void set_buzzer()
 {
@@ -180,29 +214,6 @@ int get_selecao()
 	}
 }
 
-void init(void){
-		board_init();
-		sysclk_init();
-		delay_init();
-		
-		WDT->WDT_MR = WDT_MR_WDDIS;
-		
-		pmc_enable_periph_clk(ID_PIOC);
-		
-		//BUZZER
-		pio_set_output(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 0, 0, 0);
-		
-		//START BUTTON
-		pio_set_input(START_PIO, START_PIO_IDX_MASK, PIO_DEFAULT);
-		
-		//SELEÇÃO BUTTON
-		pio_set_input(SELECAO_PIO, SELECAO_PIO_IDX_MASK, PIO_DEFAULT);
-		
-		
-			
-		
-}
-
 void buzzer_test(int freq)
 {
 	set_buzzer();
@@ -219,27 +230,78 @@ void buzzer_play(double delay_time)
 	delay_us(delay_time);
 }
 
-/*
+/**
  * freq: Frequecia em Hz
  * time: Tempo em ms que o tom deve ser gerado
  */
-
 void tone(int freq, int time){
-	double delay_time = 500000/freq;
 	double duracao = (time*freq)/(1000);
 	for(int i = 0; i < (int) duracao; i++){
-		buzzer_play(delay_time);
+		buzzer_test(freq);
 	}
-	
-	
-	//float p = ((1.0/freq)/2.0)*1000000;
-	//int duracao = (time * 1000000)/(p * 2);
-	//for(int i = 0; i < duracao; i++){
-		//set_buzzer();
-		//delay_us(p);
-		//clear_buzzer();
-		//delay_us(p);
-	//}
+}
+
+void init(void){
+		board_init();
+		sysclk_init();
+		delay_init();
+		
+		WDT->WDT_MR = WDT_MR_WDDIS;
+		
+		pmc_enable_periph_clk(ID_PIOC);
+		
+		//BUZZER
+		pio_set_output(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 0, 0, 0);
+
+		pio_configure(BUZZ_PIO, PIO_OUTPUT_0, BUZZ_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
+		pio_set_debounce_filter(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 60);
+		
+		//START BUTTON
+		pio_configure(START_PIO, PIO_INPUT, START_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
+		pio_set_debounce_filter(START_PIO, START_PIO_IDX_MASK, 60);
+		
+		//SELEï¿½ï¿½O BUTTON
+		pio_configure(SELECAO_PIO, PIO_INPUT, SELECAO_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
+		pio_set_debounce_filter(SELECAO_PIO, SELECAO_PIO_IDX_MASK, 120);
+		
+		// associacao callback
+
+		pio_handler_set(BUZZ_PIO,
+						BUZZ_PIO_IDX,
+						BUZZ_PIO_IDX_MASK,
+						PIO_IT_FALL_EDGE,
+						buzz_callback);
+
+		pio_handler_set(START_PIO,
+						START_PIO_IDX,
+						START_PIO_IDX_MASK,
+						PIO_IT_FALL_EDGE,
+						startstop_callback);
+		
+		pio_handler_set(SELECAO_PIO,
+						SELECAO_PIO_ID,
+						SELECAO_PIO_IDX_MASK,
+						PIO_IT_EDGE,
+						selecao_callback);
+		
+		// ativa interrupcao e limpa primeira IRQ
+		pio_enable_interrupt(BUZZ_PIO, BUZZ_PIO_IDX_MASK);
+		pio_get_interrupt_status(BUZZ_PIO);
+
+		pio_enable_interrupt(START_PIO, START_PIO_IDX_MASK);
+		pio_get_interrupt_status(START_PIO);
+		
+		pio_enable_interrupt(SELECAO_PIO, SELECAO_PIO_IDX_MASK);
+		pio_get_interrupt_status(SELECAO_PIO);
+		
+		// configuracao NVIC
+		NVIC_EnableIRQ(BUZZ_PIO_ID);
+		NVIC_SetPriority(BUZZ_PIO_ID, 8);
+		NVIC_EnableIRQ(START_PIO_ID);
+		NVIC_SetPriority(START_PIO_ID, 6);
+		
+		NVIC_EnableIRQ(SELECAO_PIO_ID);
+		NVIC_SetPriority(SELECAO_PIO_ID, 2);	
 }
 
 
@@ -247,7 +309,7 @@ int main (void)
 {
 	init();
 	
-	// Cria os Structs das músicas que utilizaremos
+	// Cria os Structs das mï¿½sicas que utilizaremos
 	song mario = {	.tempo = 200,
 					.melody = {
 
@@ -511,36 +573,23 @@ int main (void)
 
 	int noteDuration = 0;
 	
-	
-	
-
-	// Init OLED
-	//gfx_mono_ssd1306_init();
-  
-    // Escreve na tela um circulo e um texto
-	//gfx_mono_draw_filled_circle(20, 16, 16, GFX_PIXEL_SET, GFX_WHOLE);
-	//gfx_mono_draw_string("mundo", 50,16, &sysfont);
-	
-	
-	/* Insert application code here, after the board has been initialized. */
-	//buzzer_test(440);
 	while(1) {
 		// iterate over the notes of the melody.
 		// Remember, the array is twice the number of notes (notes + durations)
 		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
-
 			// calculates the duration of each note
 			divider = nevergonnagiveyouup.melody[thisNote + 1];
 			noteDuration = (wholenote) / abs(divider);
 			if (divider < 0) {
 				noteDuration *= 1.5; // increases the duration in half for dotted notes
-			}
+		}
 
 			// we only play the note for 90% of the duration, leaving 10% as a pause
 			tone(nevergonnagiveyouup.melody[thisNote], noteDuration * 0.9);
 
-			// Wait for the specief duration before playing the next note.
-			delay_ms(noteDuration * 0.1);
-		}
+      // Wait for the specief duration before playing the next note.
+      delay_ms(noteDuration * 0.1);
+				
 	}
+		
 }
