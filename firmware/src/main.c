@@ -241,6 +241,40 @@ void tone(int freq, int time){
 	}
 }
 
+void playsong(song name){
+		// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
+		// there are two values per note (pitch and duration), so for each note there are four bytes
+		
+		// jigglypuff.melody
+		int notes = sizeof(name.melody) / sizeof(name.melody[0]) / 2;
+
+		// this calculates the duration of a whole note in ms
+		int wholenote = (60000 * 4) / name.tempo;
+
+		int divider = 0;
+
+		int noteDuration = 0;
+		
+		// iterate over the notes of the melody.
+		// Remember, the array is twice the number of notes (notes + durations)
+		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+			// calculates the duration of each note
+			divider = name.melody[thisNote + 1];
+			noteDuration = (wholenote) / abs(divider);
+			if (divider < 0) {
+				noteDuration *= 1.5; // increases the duration in half for dotted notes
+			}
+
+			// we only play the note for 90% of the duration, leaving 10% as a pause
+			tone(name.melody[thisNote], noteDuration * 0.9);
+		}
+
+		// Wait for the specify duration before playing the next note.
+		delay_ms(noteDuration * 0.1);
+			
+}
+
+
 void init(void){
 		board_init();
 		sysclk_init();
@@ -560,36 +594,9 @@ int main (void)
 						}
 	};
 		
-	// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
-	// there are two values per note (pitch and duration), so for each note there are four bytes
-	
-	// jigglypuff.melody
-	int notes = sizeof(nevergonnagiveyouup.melody) / sizeof(nevergonnagiveyouup.melody[0]) / 2;
 
-	// this calculates the duration of a whole note in ms
-	int wholenote = (60000 * 4) / nevergonnagiveyouup.tempo;
-
-	int divider = 0;
-
-	int noteDuration = 0;
 	
 	while(1) {
-		// iterate over the notes of the melody.
-		// Remember, the array is twice the number of notes (notes + durations)
-		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
-			// calculates the duration of each note
-			divider = nevergonnagiveyouup.melody[thisNote + 1];
-			noteDuration = (wholenote) / abs(divider);
-			if (divider < 0) {
-				noteDuration *= 1.5; // increases the duration in half for dotted notes
-		}
-
-			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone(nevergonnagiveyouup.melody[thisNote], noteDuration * 0.9);
-
-      // Wait for the specief duration before playing the next note.
-      delay_ms(noteDuration * 0.1);
-				
+		playsong(nevergonnagiveyouup);
 	}
-		
 }
