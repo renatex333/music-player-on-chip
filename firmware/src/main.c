@@ -236,8 +236,9 @@ void buzzer_play(double delay_time)
  */
 void tone(int freq, int time){
 	double duracao = (time*freq)/(1000);
+	double delay_time = 500000/freq;
 	for(int i = 0; i < (int) duracao; i++){
-		buzzer_test(freq);
+		buzzer_play(delay_time);
 	}
 }
 
@@ -309,101 +310,7 @@ int main (void)
 {
 	init();
 	
-	// Cria os Structs das m�sicas que utilizaremos
-	song mario = {	.tempo = 200,
-					.melody = {
-
-							// Super Mario Bros theme
-							// Score available at https://musescore.com/user/2123/scores/2145
-							// Theme by Koji Kondo
-							
-							
-							NOTE_E5,8, NOTE_E5,8, REST,8, NOTE_E5,8, REST,8, NOTE_C5,8, NOTE_E5,8, //1
-							NOTE_G5,4, REST,4, NOTE_G4,8, REST,4,
-							NOTE_C5,-4, NOTE_G4,8, REST,4, NOTE_E4,-4, // 3
-							NOTE_A4,4, NOTE_B4,4, NOTE_AS4,8, NOTE_A4,4,
-							NOTE_G4,-8, NOTE_E5,-8, NOTE_G5,-8, NOTE_A5,4, NOTE_F5,8, NOTE_G5,8,
-							REST,8, NOTE_E5,4,NOTE_C5,8, NOTE_D5,8, NOTE_B4,-4,
-							NOTE_C5,-4, NOTE_G4,8, REST,4, NOTE_E4,-4, // repeats from 3
-							NOTE_A4,4, NOTE_B4,4, NOTE_AS4,8, NOTE_A4,4,
-							NOTE_G4,-8, NOTE_E5,-8, NOTE_G5,-8, NOTE_A5,4, NOTE_F5,8, NOTE_G5,8,
-							REST,8, NOTE_E5,4,NOTE_C5,8, NOTE_D5,8, NOTE_B4,-4,
-
-							
-							REST,4, NOTE_G5,8, NOTE_FS5,8, NOTE_F5,8, NOTE_DS5,4, NOTE_E5,8,//7
-							REST,8, NOTE_GS4,8, NOTE_A4,8, NOTE_C4,8, REST,8, NOTE_A4,8, NOTE_C5,8, NOTE_D5,8,
-							REST,4, NOTE_DS5,4, REST,8, NOTE_D5,-4,
-							NOTE_C5,2, REST,2,
-
-							REST,4, NOTE_G5,8, NOTE_FS5,8, NOTE_F5,8, NOTE_DS5,4, NOTE_E5,8,//repeats from 7
-							REST,8, NOTE_GS4,8, NOTE_A4,8, NOTE_C4,8, REST,8, NOTE_A4,8, NOTE_C5,8, NOTE_D5,8,
-							REST,4, NOTE_DS5,4, REST,8, NOTE_D5,-4,
-							NOTE_C5,2, REST,2,
-
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,4,//11
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2,
-
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,8, NOTE_E5,8,//13
-							REST,1,
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,4,
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2,
-							NOTE_E5,8, NOTE_E5,8, REST,8, NOTE_E5,8, REST,8, NOTE_C5,8, NOTE_E5,4,
-							NOTE_G5,4, REST,4, NOTE_G4,4, REST,4,
-							NOTE_C5,-4, NOTE_G4,8, REST,4, NOTE_E4,-4, // 19
-							
-							NOTE_A4,4, NOTE_B4,4, NOTE_AS4,8, NOTE_A4,4,
-							NOTE_G4,-8, NOTE_E5,-8, NOTE_G5,-8, NOTE_A5,4, NOTE_F5,8, NOTE_G5,8,
-							REST,8, NOTE_E5,4, NOTE_C5,8, NOTE_D5,8, NOTE_B4,-4,
-
-							NOTE_C5,-4, NOTE_G4,8, REST,4, NOTE_E4,-4, // repeats from 19
-							NOTE_A4,4, NOTE_B4,4, NOTE_AS4,8, NOTE_A4,4,
-							NOTE_G4,-8, NOTE_E5,-8, NOTE_G5,-8, NOTE_A5,4, NOTE_F5,8, NOTE_G5,8,
-							REST,8, NOTE_E5,4, NOTE_C5,8, NOTE_D5,8, NOTE_B4,-4,
-
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,//23
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_D5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_G5,-8, NOTE_F5,-8,
-							
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2, //26
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_B4,8, NOTE_F5,4, NOTE_F5,8, NOTE_F5,-8, NOTE_E5,-8, NOTE_D5,-8,
-							NOTE_C5,8, NOTE_E4,4, NOTE_E4,8, NOTE_C4,2,
-
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,//repeats from 23
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_D5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_G5,-8, NOTE_F5,-8,
-							
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2, //26
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_B4,8, NOTE_F5,4, NOTE_F5,8, NOTE_F5,-8, NOTE_E5,-8, NOTE_D5,-8,
-							NOTE_C5,8, NOTE_E4,4, NOTE_E4,8, NOTE_C4,2,
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,8, NOTE_E5,8,
-							REST,1,
-
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,4, //33
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2,
-							NOTE_E5,8, NOTE_E5,8, REST,8, NOTE_E5,8, REST,8, NOTE_C5,8, NOTE_E5,4,
-							NOTE_G5,4, REST,4, NOTE_G4,4, REST,4,
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_D5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_G5,-8, NOTE_F5,-8,
-							
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2, //40
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_B4,8, NOTE_F5,4, NOTE_F5,8, NOTE_F5,-8, NOTE_E5,-8, NOTE_D5,-8,
-							NOTE_C5,8, NOTE_E4,4, NOTE_E4,8, NOTE_C4,2,
-							
-							//game over sound
-							NOTE_C5,-4, NOTE_G4,-4, NOTE_E4,4, //45
-							NOTE_A4,-8, NOTE_B4,-8, NOTE_A4,-8, NOTE_GS4,-8, NOTE_AS4,-8, NOTE_GS4,-8,
-							NOTE_G4,8, NOTE_D4,8, NOTE_E4,-2,
-
-						}
-	};
-	
+	// Cria os Structs das m�sicas que utilizaremos	
 	song jigglypuff = {	.tempo = 85,
 						.melody = {
 
@@ -503,7 +410,7 @@ int main (void)
 
 								NOTE_E5,4, NOTE_D5,2, REST,4
 							}
-	};
+				};
 
 	song gameofthrones = { .tempo = 85,
 						   .melody = {
@@ -559,15 +466,18 @@ int main (void)
 							NOTE_C6,8, NOTE_G5,16, NOTE_GS5,16, NOTE_AS5,16, NOTE_C6,8, NOTE_G5,8, NOTE_GS5,16, NOTE_AS5,16
 						}
 	};
+	
+	// Criando array com as músicas adicionadas
+	song array_selecao[] = {jigglypuff, nevergonnagiveyouup, gameofthrones};
 		
 	// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 	// there are two values per note (pitch and duration), so for each note there are four bytes
 	
 	// jigglypuff.melody
-	int notes = sizeof(nevergonnagiveyouup.melody) / sizeof(nevergonnagiveyouup.melody[0]) / 2;
+	int notes = sizeof(array_selecao[0].melody) / sizeof(array_selecao[0].melody[0]) / 2;
 
 	// this calculates the duration of a whole note in ms
-	int wholenote = (60000 * 4) / nevergonnagiveyouup.tempo;
+	int wholenote = (60000 * 4) / array_selecao[0].tempo;
 
 	int divider = 0;
 
@@ -578,14 +488,16 @@ int main (void)
 		// Remember, the array is twice the number of notes (notes + durations)
 		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
 			// calculates the duration of each note
-			divider = nevergonnagiveyouup.melody[thisNote + 1];
+			divider = array_selecao[0].melody[thisNote + 1];
 			noteDuration = (wholenote) / abs(divider);
 			if (divider < 0) {
 				noteDuration *= 1.5; // increases the duration in half for dotted notes
-		}
+			}
 
 			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone(nevergonnagiveyouup.melody[thisNote], noteDuration * 0.9);
+			tone(array_selecao[0].melody[thisNote], noteDuration * 0.9);
+			
+		}
 
       // Wait for the specief duration before playing the next note.
       delay_ms(noteDuration * 0.1);
