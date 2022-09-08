@@ -127,6 +127,7 @@ void buzzer_play(double);
 void tone(int, int);
 
 void startstop_callback(void);
+void selecao_callback(void);
 
 /************************************************************************/
 /* variaveis globais e flags                                            */
@@ -134,7 +135,6 @@ void startstop_callback(void);
 
 volatile int stop = 0;
 
-volatile char buzz_flag;
 volatile char stop_flag;
 volatile char selecao_flag;
 
@@ -150,11 +150,6 @@ void startstop_callback(void)
 void selecao_callback(void)
 {
 	selecao_flag = 1;
-}
-
-void buzz_callback(void)
-{
-	buzz_flag = 1;
 }
 /************************************************************************/
 /* Criando as structs                                                   */
@@ -266,12 +261,6 @@ void init(void){
 		pio_set_debounce_filter(SELECAO_PIO, SELECAO_PIO_IDX_MASK, 120);
 		
 		// associacao callback
-
-		pio_handler_set(BUZZ_PIO,
-						BUZZ_PIO_IDX,
-						BUZZ_PIO_IDX_MASK,
-						PIO_IT_FALL_EDGE,
-						buzz_callback);
 
 		pio_handler_set(START_PIO,
 						START_PIO_IDX,
@@ -469,33 +458,33 @@ int main (void)
 	
 	// Criando array com as músicas adicionadas
 	song array_selecao[] = {jigglypuff, nevergonnagiveyouup, gameofthrones};
-		
-	// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
-	// there are two values per note (pitch and duration), so for each note there are four bytes
-	
-	// jigglypuff.melody
-	int notes = sizeof(array_selecao[0].melody) / sizeof(array_selecao[0].melody[0]) / 2;
-
-	// this calculates the duration of a whole note in ms
-	int wholenote = (60000 * 4) / array_selecao[0].tempo;
-
-	int divider = 0;
-
-	int noteDuration = 0;
-	
+	int i = 0;
+			
 	while(1) {
+		// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
+		// there are two values per note (pitch and duration), so for each note there are four bytes
+		
+		int notes = sizeof(array_selecao[i].melody) / sizeof(array_selecao[i].melody[0]) / 2;
+
+		// this calculates the duration of a whole note in ms
+		int wholenote = (60000 * 4) / array_selecao[i].tempo;
+
+		int divider = 0;
+
+		int noteDuration = 0;
+		
 		// iterate over the notes of the melody.
 		// Remember, the array is twice the number of notes (notes + durations)
-		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {			
 			// calculates the duration of each note
-			divider = array_selecao[0].melody[thisNote + 1];
+			divider = array_selecao[i].melody[thisNote + 1];
 			noteDuration = (wholenote) / abs(divider);
 			if (divider < 0) {
 				noteDuration *= 1.5; // increases the duration in half for dotted notes
 			}
 
 			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone(array_selecao[0].melody[thisNote], noteDuration * 0.9);
+			tone(array_selecao[i].melody[thisNote], noteDuration * 0.9);
 			
 		}
 
