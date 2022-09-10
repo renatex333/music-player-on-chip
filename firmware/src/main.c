@@ -6,7 +6,7 @@
 
 #define BUZZ_PIO			PIOC
 #define BUZZ_PIO_ID			ID_PIOC
-#define BUZZ_PIO_IDX			19
+#define BUZZ_PIO_IDX		19
 #define BUZZ_PIO_IDX_MASK	(1 << BUZZ_PIO_IDX)
 
 #define START_PIO			PIOC
@@ -18,6 +18,15 @@
 #define SELECAO_PIO_ID		 ID_PIOD
 #define SELECAO_PIO_IDX		 28
 #define SELECAO_PIO_IDX_MASK (1 << SELECAO_PIO_IDX)
+
+/*  Default pin configuration (no attribute). */
+#define _PIO_DEFAULT             (0u << 0)
+/*  The internal pin pull-up is active. */
+#define _PIO_PULLUP              (1u << 0)
+/*  The internal glitch filter is active. */
+#define _PIO_DEGLITCH            (1u << 1)
+/*  The internal debouncing filter is active. */
+#define _PIO_DEBOUNCE            (1u << 3)
 
 
 /* Definir as notas */
@@ -127,6 +136,7 @@ void buzzer_play(double);
 void tone(int, int);
 
 void startstop_callback(void);
+void selecao_callback(void);
 
 /************************************************************************/
 /* variaveis globais e flags                                            */
@@ -137,23 +147,37 @@ volatile char play_flag;
 volatile char selecao_flag;
 volatile char stopped_flag;
 
+char songname[10];
+
 /************************************************************************/
 /* handler / callbacks                                                  */
 /************************************************************************/
 
+//void startstop_callback(void)
+//{
+	//if(!stopped_flag){
+		//stop_flag = 1;
+	//}
+	//if(stopped_flag){
+		//play_flag = 1;
+	//}
+	//
+//}
+
 void startstop_callback(void)
 {
-	if(!stopped_flag){
+	if(stop_flag){
+		stop_flag = 0;
+	} else {
 		stop_flag = 1;
-	}
-	if(stopped_flag){
-		play_flag = 1;
 	}
 	
 }
 
+
 void selecao_callback(void)
 {
+	selecao_flag = 1;
 }
 
 /************************************************************************/
@@ -161,6 +185,8 @@ void selecao_callback(void)
 /************************************************************************/
 
 typedef struct  {
+	
+	char name[11];
 	
 	// change this to make the song slower or faster
 	int tempo;
@@ -222,14 +248,6 @@ void buzzer_test(int freq)
 	delay_us(500000/freq);
 }
 
-void buzzer_play(double delay_time)
-{
-	set_buzzer();
-	delay_us(delay_time);
-	clear_buzzer();
-	delay_us(delay_time);
-}
-
 /**
  * freq: Frequecia em Hz
  * time: Tempo em ms que o tom deve ser gerado
@@ -241,15 +259,15 @@ void tone(int freq, int time){
 	}
 }
 
-void playsong(song name){
+void playsong(song now_playing){
 		// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 		// there are two values per note (pitch and duration), so for each note there are four bytes
 		
 		// jigglypuff.melody
-		int notes = sizeof(name.melody) / sizeof(name.melody[0]) / 2;
+		int notes = sizeof(now_playing.melody) / sizeof(now_playing.melody[0]) / 2;
 
 		// this calculates the duration of a whole note in ms
-		int wholenote = (60000 * 4) / name.tempo;
+		int wholenote = (60000 * 4) / now_playing.tempo;
 
 		int divider = 0;
 
@@ -258,18 +276,22 @@ void playsong(song name){
 		// iterate over the notes of the melody.
 		// Remember, the array is twice the number of notes (notes + durations)
 		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
-			if(stop_flag){
+			if(selecao_flag){
 				 return;
 			}
+			if(stop_flag){
+				pmc_sleep(SAM_PM_SMODE_SLEEP_WFI);
+			}
+			
 			// calculates the duration of each note
-			divider = name.melody[thisNote + 1];
+			divider = now_playing.melody[thisNote + 1];
 			noteDuration = (wholenote) / abs(divider);
 			if (divider < 0) {
 				noteDuration *= 1.5; // increases the duration in half for dotted notes
 			}
 
 			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone(name.melody[thisNote], noteDuration * 0.9);
+			tone(now_playing.melody[thisNote], noteDuration * 0.9);
 		}
 
 		// Wait for the specify duration before playing the next note.
@@ -299,7 +321,7 @@ void init(void){
 		pio_configure(START_PIO, PIO_INPUT, START_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
 		pio_set_debounce_filter(START_PIO, START_PIO_IDX_MASK, 120);
 		
-		//SELE��O BUTTON
+		//SELEÇÃO BUTTON
 		pio_configure(SELECAO_PIO, PIO_INPUT, SELECAO_PIO_IDX_MASK, PIO_PULLUP | PIO_DEBOUNCE);
 		pio_set_debounce_filter(SELECAO_PIO, SELECAO_PIO_IDX_MASK, 120);
 		
@@ -313,7 +335,7 @@ void init(void){
 		pio_handler_set(SELECAO_PIO,
 						SELECAO_PIO_ID,
 						SELECAO_PIO_IDX_MASK,
-						PIO_IT_EDGE,
+						PIO_IT_FALL_EDGE,
 						selecao_callback);
 		
 		// ativa interrupcao e limpa primeira IRQ
@@ -326,113 +348,21 @@ void init(void){
 		
 		// configuracao NVIC
 		NVIC_EnableIRQ(START_PIO_ID);
-		NVIC_SetPriority(START_PIO_ID, 3);
+		NVIC_SetPriority(START_PIO_ID, 4);
 		
 		NVIC_EnableIRQ(SELECAO_PIO_ID);
-		NVIC_SetPriority(SELECAO_PIO_ID, 2);
+		NVIC_SetPriority(SELECAO_PIO_ID, 4);
 }
 
 
 int main (void)
 {
 	init();
+	gfx_mono_ssd1306_init();
 	
-	// Cria os Structs das m�sicas que utilizaremos
-	song mario = {	.tempo = 200,
-					.melody = {
-
-							// Super Mario Bros theme
-							// Score available at https://musescore.com/user/2123/scores/2145
-							// Theme by Koji Kondo
-							
-							
-							NOTE_E5,8, NOTE_E5,8, REST,8, NOTE_E5,8, REST,8, NOTE_C5,8, NOTE_E5,8, //1
-							NOTE_G5,4, REST,4, NOTE_G4,8, REST,4,
-							NOTE_C5,-4, NOTE_G4,8, REST,4, NOTE_E4,-4, // 3
-							NOTE_A4,4, NOTE_B4,4, NOTE_AS4,8, NOTE_A4,4,
-							NOTE_G4,-8, NOTE_E5,-8, NOTE_G5,-8, NOTE_A5,4, NOTE_F5,8, NOTE_G5,8,
-							REST,8, NOTE_E5,4,NOTE_C5,8, NOTE_D5,8, NOTE_B4,-4,
-							NOTE_C5,-4, NOTE_G4,8, REST,4, NOTE_E4,-4, // repeats from 3
-							NOTE_A4,4, NOTE_B4,4, NOTE_AS4,8, NOTE_A4,4,
-							NOTE_G4,-8, NOTE_E5,-8, NOTE_G5,-8, NOTE_A5,4, NOTE_F5,8, NOTE_G5,8,
-							REST,8, NOTE_E5,4,NOTE_C5,8, NOTE_D5,8, NOTE_B4,-4,
-
-							
-							REST,4, NOTE_G5,8, NOTE_FS5,8, NOTE_F5,8, NOTE_DS5,4, NOTE_E5,8,//7
-							REST,8, NOTE_GS4,8, NOTE_A4,8, NOTE_C4,8, REST,8, NOTE_A4,8, NOTE_C5,8, NOTE_D5,8,
-							REST,4, NOTE_DS5,4, REST,8, NOTE_D5,-4,
-							NOTE_C5,2, REST,2,
-
-							REST,4, NOTE_G5,8, NOTE_FS5,8, NOTE_F5,8, NOTE_DS5,4, NOTE_E5,8,//repeats from 7
-							REST,8, NOTE_GS4,8, NOTE_A4,8, NOTE_C4,8, REST,8, NOTE_A4,8, NOTE_C5,8, NOTE_D5,8,
-							REST,4, NOTE_DS5,4, REST,8, NOTE_D5,-4,
-							NOTE_C5,2, REST,2,
-
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,4,//11
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2,
-
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,8, NOTE_E5,8,//13
-							REST,1,
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,4,
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2,
-							NOTE_E5,8, NOTE_E5,8, REST,8, NOTE_E5,8, REST,8, NOTE_C5,8, NOTE_E5,4,
-							NOTE_G5,4, REST,4, NOTE_G4,4, REST,4,
-							NOTE_C5,-4, NOTE_G4,8, REST,4, NOTE_E4,-4, // 19
-							
-							NOTE_A4,4, NOTE_B4,4, NOTE_AS4,8, NOTE_A4,4,
-							NOTE_G4,-8, NOTE_E5,-8, NOTE_G5,-8, NOTE_A5,4, NOTE_F5,8, NOTE_G5,8,
-							REST,8, NOTE_E5,4, NOTE_C5,8, NOTE_D5,8, NOTE_B4,-4,
-
-							NOTE_C5,-4, NOTE_G4,8, REST,4, NOTE_E4,-4, // repeats from 19
-							NOTE_A4,4, NOTE_B4,4, NOTE_AS4,8, NOTE_A4,4,
-							NOTE_G4,-8, NOTE_E5,-8, NOTE_G5,-8, NOTE_A5,4, NOTE_F5,8, NOTE_G5,8,
-							REST,8, NOTE_E5,4, NOTE_C5,8, NOTE_D5,8, NOTE_B4,-4,
-
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,//23
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_D5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_G5,-8, NOTE_F5,-8,
-							
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2, //26
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_B4,8, NOTE_F5,4, NOTE_F5,8, NOTE_F5,-8, NOTE_E5,-8, NOTE_D5,-8,
-							NOTE_C5,8, NOTE_E4,4, NOTE_E4,8, NOTE_C4,2,
-
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,//repeats from 23
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_D5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_G5,-8, NOTE_F5,-8,
-							
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2, //26
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_B4,8, NOTE_F5,4, NOTE_F5,8, NOTE_F5,-8, NOTE_E5,-8, NOTE_D5,-8,
-							NOTE_C5,8, NOTE_E4,4, NOTE_E4,8, NOTE_C4,2,
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,8, NOTE_E5,8,
-							REST,1,
-
-							NOTE_C5,8, NOTE_C5,4, NOTE_C5,8, REST,8, NOTE_C5,8, NOTE_D5,4, //33
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2,
-							NOTE_E5,8, NOTE_E5,8, REST,8, NOTE_E5,8, REST,8, NOTE_C5,8, NOTE_E5,4,
-							NOTE_G5,4, REST,4, NOTE_G4,4, REST,4,
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_D5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_A5,-8, NOTE_G5,-8, NOTE_F5,-8,
-							
-							NOTE_E5,8, NOTE_C5,4, NOTE_A4,8, NOTE_G4,2, //40
-							NOTE_E5,8, NOTE_C5,4, NOTE_G4,8, REST,4, NOTE_GS4,4,
-							NOTE_A4,8, NOTE_F5,4, NOTE_F5,8, NOTE_A4,2,
-							NOTE_B4,8, NOTE_F5,4, NOTE_F5,8, NOTE_F5,-8, NOTE_E5,-8, NOTE_D5,-8,
-							NOTE_C5,8, NOTE_E4,4, NOTE_E4,8, NOTE_C4,2,
-							
-							//game over sound
-							NOTE_C5,-4, NOTE_G4,-4, NOTE_E4,4, //45
-							NOTE_A4,-8, NOTE_B4,-8, NOTE_A4,-8, NOTE_GS4,-8, NOTE_AS4,-8, NOTE_GS4,-8,
-							NOTE_G4,8, NOTE_D4,8, NOTE_E4,-2,
-
-						}
-	};
-	
-	song jigglypuff = {	.tempo = 85,
+	// Cria os Structs das músicas que utilizaremos	
+	song jigglypuff = {	.name = "Jigglypuff",
+						.tempo = 85,
 						.melody = {
 
 							// Jigglypuff's Song
@@ -457,7 +387,8 @@ int main (void)
 						}
 	};
 
-	song nevergonnagiveyouup = { .tempo = 114,
+	song nevergonnagiveyouup = { .name = "Rick Roll ",
+								 .tempo = 114,
 								 .melody = {
 
 								// Never Gonna Give You Up - Rick Astley
@@ -533,7 +464,8 @@ int main (void)
 							}
 	};
 
-	song gameofthrones = { .tempo = 85,
+	song gameofthrones = { .name = "GOT Theme ",
+						   .tempo = 85,
 						   .melody = {
 
 							// Game of Thrones
@@ -587,19 +519,23 @@ int main (void)
 							NOTE_C6,8, NOTE_G5,16, NOTE_GS5,16, NOTE_AS5,16, NOTE_C6,8, NOTE_G5,8, NOTE_GS5,16, NOTE_AS5,16
 						}
 	};
+	
+	song selecao_musicas[3] = {jigglypuff, nevergonnagiveyouup, gameofthrones};
+	int i = 0; // Index para seleção das músicas do array
 		
 
 	
 	while(1) {
-		if(stop_flag){
-			stopped_flag = 1;
-			if(play_flag){
-				stop_flag = 0;
-				play_flag = 0;
-				stopped_flag = 0;
+		if(selecao_flag){
+			selecao_flag = 0;
+			i++;
+			if(i > 2){
+				i = 0;
 			}
 		}
-		playsong(nevergonnagiveyouup);
+		sprintf(songname, "%s", selecao_musicas[i].name);
+		gfx_mono_draw_string(songname, 0, 0, &sysfont);
+		playsong(selecao_musicas[i]);
 		
 	}
 }
