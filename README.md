@@ -22,10 +22,14 @@ https://insper.github.io/ComputacaoEmbarcada/APS-1-Musical/
 |------------|-----------------|---------|
 | BUZZER     |      PC19       |         |
 | Start/Stop |      PC31       |Button 2 |
-| SELEÇÃO    |      PD28       |Button 1 |
+| SELECTION  |      PD28       |Button 1 |
 | LED1       |      PA0        |         |
 | LED2       |      PC30       |         |
 | LED3       |      PB2        |         |
+
+- The start/stop button can play or pause.
+- Use the Selection to change Songs.
+- The 3 leds will flash according to the notes duration giving it a cool adition to the project.
 
 ### Setup
 <img src="https://user-images.githubusercontent.com/15271557/189542702-80d9a59f-aff5-4ff8-8af1-4542a70b7887.jpeg" width="500">
