@@ -8,6 +8,10 @@
 #include "jigglypuff.h"
 #include "nevergonnagiveyouup.h"
 #include "gameofthrones.h"
+#include "zelda.h"
+#include "doom.h"
+#include "starwars.h"
+
 
 #include "gfx_mono_ug_2832hsweg04.h"
 #include "gfx_mono_text.h"
@@ -155,10 +159,13 @@ void buzzer_test(int freq)
 void tone(int freq, int time){
 	double duracao = (time*freq)/(1000);
 	for(int i = 0; i < (int) duracao; i++){
-		if(time >= 700){
+		if(selecao_flag || stop_flag){
+			break;
+		}
+		if(time >= 900){
 			pio_clear(LED3_PIO, LED3_PIO_IDX_MASK);
 		}
-		if(time < 700 && time > 400){
+		if(time < 900 && time > 400){
 			pio_clear(LED2_PIO, LED2_PIO_IDX_MASK);
 		}
 		if(time <= 400){
@@ -296,16 +303,17 @@ int main (void)
 	init();
 	gfx_mono_ssd1306_init();
 	
-	song selecao_musicas[3] = {jigglypuff, nevergonnagiveyouup, gameofthrones};
+	song selecao_musicas[6] = {jigglypuff, nevergonnagiveyouup, gameofthrones, zelda, doom, starwars};
 	int i = 0; // Index para seleção das músicas do array
 	
 	while(1) {
 		if(selecao_flag){
 			selecao_flag = 0;
 			i++;
-			if(i > 2){
+			if(i > 5){
 				i = 0;
 			}
+			gfx_mono_draw_string("               ", 0, 0, &sysfont);
 		}
 		sprintf(songname, "%s", selecao_musicas[i].name);
 		gfx_mono_draw_string(songname, 0, 0, &sysfont);

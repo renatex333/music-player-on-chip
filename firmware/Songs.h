@@ -98,7 +98,7 @@
 /************************************************************************/
 typedef struct  {
 	
-	char name[20];
+	char name[11];
 	
 	// change this to make the song slower or faster
 	int tempo;
@@ -107,7 +107,7 @@ typedef struct  {
 	// a 4 means a quarter note, 8 an eighteenth , 16 sixteenth, so on
 	// !!negative numbers are used to represent dotted notes,
 	// so -4 means a dotted quarter note, that is, a quarter plus an eighteenth!!
-	int melody[250];
+	int melody[1000];
 	
 } song;
 
