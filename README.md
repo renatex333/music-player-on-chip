@@ -1,33 +1,43 @@
-# 21a-emb-aps1
+# Music Player - APS 1
 
-Embarcados - APS 1 - Musical!
+## Documentation 
 
-Para maiores informações acesse:
+This was made as a project for the class Embarcados - Insper, and it consists of making a Music Player using the Atmel SAME70-XPLD.
+
+For more information access:
 
 https://insper.github.io/ComputacaoEmbarcada/APS-1-Musical/
 
-Issues serão abertos neste repositório para guiar o desenvolvimento
-da dupla. **Vocês não devem fechar os issues, apenas a equipe de professores!**, porém devem referenciar nos commits quando um issue 
-foi concluído! Isso gerará um PR no classroom que será avaliado pela equipe.
+### Componenets used
+- Atmel SAME70-XPLD
+-  OLED1 Xplained Pro
+- Protoboard
+- Jumpers
+- Buzzer
 
-## Documentação
+### Pins & Functionalities
 
-TODO: Aualizar pinos
-
-| Função  | PINO (ex: PA11) |
+| Funtion |      PINS       |
 |---------|-----------------|
 | BUZZER  |      PC19       |
 | START   |      PC31       |
 | SELEÇÃO |      PD28       |
+| LED1    |      PA0        |
+| LED2    |      PC30       |
+| LED3    |      PB2        |
 
-### Imagem da montagem
-
-TODO: Inserir imagem do sistema montado
+### Setup
+<img src="https://user-images.githubusercontent.com/15271557/189542702-80d9a59f-aff5-4ff8-8af1-4542a70b7887.jpeg" width="500">
 
 ### Vídeo do projeto
 
 TODO: Inserir link para vídeo do projeto funcionando
 
-### Músicas e Direitos autorais
+### Music List
 
-TODO: Listar músicas e dar crédio da onde saiu:
+All Songs chosen were made by Robson Couto, you can access his Arduino Songs clicking this [Link](https://github.com/robsoncouto/arduino-songs)
+
+**Songs** 
+- [Game Of Thrones Theme Song](https://github.com/robsoncouto/arduino-songs/blob/master/gameofthrones/gameofthrones.ino)
+- [Jigglypuff Song](https://github.com/robsoncouto/arduino-songs/blob/master/jigglypuffsong/jigglypuffsong.ino)
+- [Never Gonna Give You Up Song](https://github.com/robsoncouto/arduino-songs/blob/master/nevergonnagiveyouup/nevergonnagiveyouup.ino) - Arranged by Chlorondria
