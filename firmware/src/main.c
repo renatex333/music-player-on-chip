@@ -19,6 +19,21 @@
 #define SELECAO_PIO_IDX		 28
 #define SELECAO_PIO_IDX_MASK (1 << SELECAO_PIO_IDX)
 
+#define LED1_PIO				 PIOA
+#define LED1_PIO_ID				 ID_PIOA
+#define LED1_PIO_IDX			 0
+#define LED1_PIO_IDX_MASK		 (1 << LED1_PIO_IDX)
+
+#define LED2_PIO				 PIOC
+#define LED2_PIO_ID				 ID_PIOC
+#define LED2_PIO_IDX			 30
+#define LED2_PIO_IDX_MASK		 (1 << LED2_PIO_IDX)
+
+#define LED3_PIO				 PIOB
+#define LED3_PIO_ID				 ID_PIOB
+#define LED3_PIO_IDX			 2
+#define LED3_PIO_IDX_MASK		 (1 << LED3_PIO_IDX)
+
 /*  Default pin configuration (no attribute). */
 #define _PIO_DEFAULT             (0u << 0)
 /*  The internal pin pull-up is active. */
@@ -153,17 +168,6 @@ char songname[10];
 /* handler / callbacks                                                  */
 /************************************************************************/
 
-//void startstop_callback(void)
-//{
-	//if(!stopped_flag){
-		//stop_flag = 1;
-	//}
-	//if(stopped_flag){
-		//play_flag = 1;
-	//}
-	//
-//}
-
 void startstop_callback(void)
 {
 	if(stop_flag){
@@ -255,6 +259,16 @@ void buzzer_test(int freq)
 void tone(int freq, int time){
 	double duracao = (time*freq)/(1000);
 	for(int i = 0; i < (int) duracao; i++){
+		if(time >= 700){
+			pio_clear(LED3_PIO, LED3_PIO_IDX_MASK);
+		}
+		if(time < 700 && time > 400){
+			pio_clear(LED2_PIO, LED2_PIO_IDX_MASK);
+		}
+		if(time <= 400){
+			pio_clear(LED1_PIO, LED1_PIO_IDX_MASK);
+		}
+		
 		buzzer_test(freq);
 	}
 }
@@ -280,6 +294,10 @@ void playsong(song now_playing){
 				 return;
 			}
 			if(stop_flag){
+				pio_set(LED1_PIO, LED1_PIO_IDX_MASK);
+				pio_set(LED2_PIO, LED2_PIO_IDX_MASK);
+				pio_set(LED3_PIO, LED3_PIO_IDX_MASK);
+				
 				pmc_sleep(SAM_PM_SMODE_SLEEP_WFI);
 			}
 			
@@ -289,13 +307,21 @@ void playsong(song now_playing){
 			if (divider < 0) {
 				noteDuration *= 1.5; // increases the duration in half for dotted notes
 			}
-
+			
 			// we only play the note for 90% of the duration, leaving 10% as a pause
 			tone(now_playing.melody[thisNote], noteDuration * 0.9);
+			
+			
+			pio_set(LED3_PIO, LED3_PIO_IDX_MASK);
+			pio_set(LED2_PIO, LED2_PIO_IDX_MASK);
+			pio_set(LED1_PIO, LED1_PIO_IDX_MASK);
+
+			delay_us(30000);
 		}
 
 		// Wait for the specify duration before playing the next note.
 		delay_ms(noteDuration * 0.1);
+		
 		
 }
 
@@ -310,6 +336,20 @@ void init(void){
 		pmc_enable_periph_clk(BUZZ_PIO);
 		pmc_enable_periph_clk(START_PIO);
 		pmc_enable_periph_clk(SELECAO_PIO);
+		pmc_enable_periph_clk(LED1_PIO);
+		pmc_enable_periph_clk(LED2_PIO);
+		pmc_enable_periph_clk(LED3_PIO);
+		
+		// Configura led
+		pio_configure(LED1_PIO, PIO_OUTPUT_0, LED1_PIO_IDX_MASK ,PIO_DEFAULT);
+		pio_configure(LED2_PIO, PIO_OUTPUT_0, LED2_PIO_IDX_MASK ,PIO_DEFAULT);
+		pio_configure(LED3_PIO, PIO_OUTPUT_0, LED3_PIO_IDX_MASK ,PIO_DEFAULT);
+		
+		pio_set(LED1_PIO, LED1_PIO_IDX_MASK);
+		pio_set(LED2_PIO, LED2_PIO_IDX_MASK);
+		pio_set(LED3_PIO, LED3_PIO_IDX_MASK);
+		
+		
 		
 		//BUZZER
 		pio_set_output(BUZZ_PIO, BUZZ_PIO_IDX_MASK, 0, 0, 0);
@@ -535,7 +575,6 @@ int main (void)
 		}
 		sprintf(songname, "%s", selecao_musicas[i].name);
 		gfx_mono_draw_string(songname, 0, 0, &sysfont);
-		playsong(selecao_musicas[i]);
-		
+		playsong(selecao_musicas[i]);		
 	}
 }
