@@ -57,7 +57,6 @@ void startstop_callback(void)
 	} else {
 		stop_flag = 1;
 	}
-	
 }
 
 
@@ -102,7 +101,7 @@ int get_selecao()
 	
 	if(status && SELECAO_PIO_IDX_MASK == 0){
 		return 0;
-		} else {
+	} else {
 		return 1;
 	}
 }
@@ -121,20 +120,17 @@ void buzzer_test(int freq)
  */
 void tone(int freq, int time){
 	double duracao = (time*freq)/(1000);
+	if(time >= 900){
+		pio_clear(LED3_PIO, LED3_PIO_IDX_MASK);
+	} else if(time < 900 && time > 400){
+		pio_clear(LED2_PIO, LED2_PIO_IDX_MASK);
+	} else if(time <= 400){
+		pio_clear(LED1_PIO, LED1_PIO_IDX_MASK);
+	}
 	for(int i = 0; i < (int) duracao; i++){
 		if(selecao_flag || stop_flag){
 			break;
-		}
-		if(time >= 900){
-			pio_clear(LED3_PIO, LED3_PIO_IDX_MASK);
-		}
-		if(time < 900 && time > 400){
-			pio_clear(LED2_PIO, LED2_PIO_IDX_MASK);
-		}
-		if(time <= 400){
-			pio_clear(LED1_PIO, LED1_PIO_IDX_MASK);
-		}
-		
+		}		
 		buzzer_test(freq);
 	}
 }
@@ -142,9 +138,6 @@ void tone(int freq, int time){
 void playsong(song now_playing){
 		// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 		// there are two values per note (pitch and duration), so for each note there are four bytes
-		
-		// jigglypuff.melody
-		int notes = sizeof(now_playing.melody) / sizeof(now_playing.melody[0]) / 2;
 
 		// this calculates the duration of a whole note in ms
 		int wholenote = (60000 * 4) / now_playing.tempo;
@@ -155,7 +148,7 @@ void playsong(song now_playing){
 		
 		// iterate over the notes of the melody.
 		// Remember, the array is twice the number of notes (notes + durations)
-		for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+		for (int thisNote = 0; thisNote < now_playing.notes * 2; thisNote = thisNote + 2) {
 			if(selecao_flag){
 				 return;
 			}
@@ -187,8 +180,6 @@ void playsong(song now_playing){
 
 		// Wait for the specify duration before playing the next note.
 		delay_ms(noteDuration * 0.1);
-		
-		
 }
 
 
