@@ -55,3 +55,7 @@ They are in this order:
 - [Doom](https://github.com/robsoncouto/arduino-songs/blob/master/doom/doom.ino)
 - [Star Wars](https://github.com/robsoncouto/arduino-songs/blob/master/starwars/starwars.ino)
 
+### Estruturação do código
+
+O código foi estruturado pensando na utilização de callbacks que alteram flags para pausar e tocar a música e para passar para as próximas músicas. A função que coordena a execução da música no buzzer é chamada de playsong() que, de acordo com a frequência das notas e de sua duração, ativa o buzzer através da função tone() que liga o buzzer pela duração determinada. Além disso, acende os LEDs do OLED de acordo com a frequência da nota tocada, mostrando visualmente quando algum som é tocado.
+
