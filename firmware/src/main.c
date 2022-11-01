@@ -52,11 +52,7 @@ char songname[10];
 
 void startstop_callback(void)
 {
-	if(stop_flag){
-		stop_flag = 0;
-	} else {
-		stop_flag = 1;
-	}
+	stop_flag = !stop_flag;
 }
 
 
