@@ -563,10 +563,34 @@
     <Compile Include="src\ASF\sam\drivers\tc\tc.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\defines.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\songs.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\starwars.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\zelda.h">
+      <SubType>compile</SubType>
+    </Compile>
     <None Include="src\ASF\sam\drivers\tc\tc.h">
       <SubType>compile</SubType>
     </None>
     <Compile Include="src\config\conf_sysfont.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\doom.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\gameofthrones.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\jigglypuff.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\nevergonnagiveyouup.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\oled\gfx_mono.h">
