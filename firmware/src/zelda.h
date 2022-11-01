@@ -1,11 +1,9 @@
 #ifndef ZELDA_H
 #define ZELDA_H
 
-#include "Songs.h"
+#include "songs.h"
 
-song zelda = { .name = "Zelda",
-	.tempo = 88,
-	.melody = {
+int melody_arr[250] = {
 		
 		/* 
 			The legend of Zelda theme 
@@ -43,7 +41,12 @@ song zelda = { .name = "Zelda",
 		 NOTE_F5,4, NOTE_CS5,2, NOTE_AS4,4,
 		 NOTE_C5,-8, NOTE_D5,16, NOTE_E5,2, NOTE_G5,8,
 		 NOTE_F5,16, NOTE_F4,16, NOTE_F4,16, NOTE_F4,16,NOTE_F4,16,NOTE_F4,16,NOTE_F4,16,NOTE_F4,16,NOTE_F4,8, NOTE_F4,16,NOTE_F4,8
-	}
+	};
+
+song zelda = { .name = "Zelda",
+	.tempo = 88,
+	.melody = melody_arr,
+	.notes = sizeof(melody_arr) / sizeof(melody_arr[0]) / 2
 };
 
 #endif

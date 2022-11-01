@@ -109,6 +109,8 @@ typedef struct  {
 	// so -4 means a dotted quarter note, that is, a quarter plus an eighteenth!!
 	int melody[250];
 	
+	int notes;
+	
 } song;
 
 #endif
