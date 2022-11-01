@@ -1,3 +1,6 @@
+#ifndef DOOM_H
+#define DOOM_H
+
 #include "Songs.h"
 
 song doom = { .name = "Doom",
@@ -123,3 +126,5 @@ song doom = { .name = "Doom",
 		 NOTE_B3, -16, NOTE_G3, -16, NOTE_E3, -16, NOTE_B2, -16, NOTE_E3, -16, NOTE_G3, -16, NOTE_C4, -16, NOTE_B3, -16, NOTE_G3, -16, NOTE_B3, -16, NOTE_G3, -16, NOTE_E3, -16,
 	}
 };
+
+#endif

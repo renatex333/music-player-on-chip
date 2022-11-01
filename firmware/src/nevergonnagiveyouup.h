@@ -1,3 +1,6 @@
+#ifndef NGGYU_H
+#define NGGYU_H
+
 #include "Songs.h"
 
 song nevergonnagiveyouup = { .name = "Rick Roll ",
@@ -76,3 +79,5 @@ song nevergonnagiveyouup = { .name = "Rick Roll ",
 		NOTE_E5,4, NOTE_D5,2, REST,4
 	}
 };
+
+#endif

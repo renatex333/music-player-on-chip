@@ -1,3 +1,6 @@
+#ifndef GOT_H
+#define GOT_H
+
 #include "Songs.h"
 
 song gameofthrones = { .name = "GOT Theme",
@@ -55,3 +58,5 @@ song gameofthrones = { .name = "GOT Theme",
 		NOTE_C6,8, NOTE_G5,16, NOTE_GS5,16, NOTE_AS5,16, NOTE_C6,8, NOTE_G5,8, NOTE_GS5,16, NOTE_AS5,16
 	}
 };
+
+#endif

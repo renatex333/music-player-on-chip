@@ -1,3 +1,6 @@
+#ifndef ZELDA_H
+#define ZELDA_H
+
 #include "Songs.h"
 
 song zelda = { .name = "Zelda",
@@ -42,3 +45,5 @@ song zelda = { .name = "Zelda",
 		 NOTE_F5,16, NOTE_F4,16, NOTE_F4,16, NOTE_F4,16,NOTE_F4,16,NOTE_F4,16,NOTE_F4,16,NOTE_F4,16,NOTE_F4,8, NOTE_F4,16,NOTE_F4,8
 	}
 };
+
+#endif

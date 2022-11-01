@@ -1,3 +1,6 @@
+#ifndef JIGGLY_H
+#define JIGGLY_H
+
 #include "Songs.h"
 
 song jigglypuff = {	.name = "Jigglypuff",
@@ -25,3 +28,5 @@ song jigglypuff = {	.name = "Jigglypuff",
 		
 	}
 };
+
+#endif

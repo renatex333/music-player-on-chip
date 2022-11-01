@@ -1,3 +1,6 @@
+#ifndef STARW_H
+#define STARW_H
+
 #include "Songs.h"
 
 song starwars = {	.name = "Star Wars",
@@ -30,3 +33,5 @@ song starwars = {	.name = "Star Wars",
 		
 	}
 };
+
+#endif
