@@ -169,7 +169,7 @@ void playsong(song now_playing){
 			}
 			
 			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone(now_playing.melody[thisNote], noteDuration * 0.9);
+			tone(now_playing.melody[thisNote], noteDuration);
 			
 			
 			pio_set(LED3_PIO, LED3_PIO_IDX_MASK);
@@ -178,9 +178,6 @@ void playsong(song now_playing){
 
 			delay_us(30000);
 		}
-
-		// Wait for the specify duration before playing the next note.
-		delay_ms(noteDuration * 0.1);
 }
 
 
