@@ -115,19 +115,24 @@ void buzzer_test(int freq)
  * time: Tempo em ms que o tom deve ser gerado
  */
 void tone(int freq, int time){
-	double duracao = (time*freq)/(1000);
-	if(time >= 900){
-		pio_clear(LED3_PIO, LED3_PIO_IDX_MASK);
-	} else if(time < 900 && time > 400){
-		pio_clear(LED2_PIO, LED2_PIO_IDX_MASK);
-	} else if(time <= 400){
-		pio_clear(LED1_PIO, LED1_PIO_IDX_MASK);
-	}
-	for(int i = 0; i < (int) duracao; i++){
-		if(selecao_flag || stop_flag){
-			break;
-		}		
-		buzzer_test(freq);
+	if(freq == 0){
+		//recebe em milisegundos e multiplica por 1000 para converter para microsegundos
+		delay_us(time*1000);
+	} else {
+		double duracao = (time*freq)/(1000);
+		if(time >= 900){
+			pio_clear(LED3_PIO, LED3_PIO_IDX_MASK);
+		} else if(time < 900 && time > 400){
+			pio_clear(LED2_PIO, LED2_PIO_IDX_MASK);
+		} else if(time <= 400){
+			pio_clear(LED1_PIO, LED1_PIO_IDX_MASK);
+		}
+		for(int i = 0; i < (int) duracao; i++){
+			if(selecao_flag || stop_flag){
+				break;
+			}
+			buzzer_test(freq);
+		}
 	}
 }
 
