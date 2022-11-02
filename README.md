@@ -20,7 +20,8 @@ https://insper.github.io/ComputacaoEmbarcada/APS-1-Musical/
 
 | Funtion    |      PINS       | BUTTONS |
 |------------|-----------------|---------|
-| BUZZER     |      PC19       |         |
+| BUZZER +   |      PC19       |         |
+| BUZZER -   |      GND        |         |
 | Start/Stop |      PC31       |Button 2 |
 | SELECTION  |      PD28       |Button 1 |
 | LED1       |      PA0        |         |
@@ -57,5 +58,9 @@ They are in this order:
 
 ### Estruturação do código
 
-O código foi estruturado pensando na utilização de callbacks que alteram flags para pausar e tocar a música e para passar para as próximas músicas. A função que coordena a execução da música no buzzer é chamada de playsong() que, de acordo com a frequência das notas e de sua duração, ativa o buzzer através da função tone() que liga o buzzer pela duração determinada. Além disso, acende os LEDs do OLED de acordo com a frequência da nota tocada, mostrando visualmente quando algum som é tocado.
+O código foi estruturado nos seguintes arquivos:
 
+- `Songs.h` &rarr; arquivo no qual foram definidas as notas com suas respectivas durações.
+- `defines.h` &rarr; arquivo no qual foram definidos os pinos dedicados a cada periférico, como o buzzer, botões e leds.
+- `jigglypuff.h`, `nevergonnagiveyouup.h`, `gameofthrones.h`, `zelda.h`, `doom.h`, `starwars.h` &rarr; arquivos nos quais foram definidos os arrays com as melodias das músicas.
+- `main.c` &rarr; arquivo com todas as funções necessárias para a execução do software. Nele são encontrados funções de callback que lidam com a mudança de estados das flags com o apertar dos botões, funções que retornam os estados de deteerminados pinos, funções que ativam ou desativam o pino que liga o buzzer, além das funções principais que controlam o buzzer para que ele ligue/desligue nas durações determinadas e, desta forma, tocar a música desejada.
