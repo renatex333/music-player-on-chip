@@ -3,7 +3,7 @@
 
 #include "songs.h"
 
-int melody_arr[250] = {		
+int melody_doom[] = {		
 		/*
 			At Doom's Gate (H1M1)
 			Connect a piezo buzzer or speaker to pin 11 or select a new pin.
@@ -122,12 +122,7 @@ int melody_arr[250] = {
 		 NOTE_C3, 8, NOTE_E2, 8, NOTE_E2, 8, NOTE_AS2, 8, NOTE_E2, 8, NOTE_E2, 8, NOTE_B2, 8, NOTE_C3, 8,
 		 NOTE_E2, 8, NOTE_E2, 8, NOTE_E3, 8, NOTE_E2, 8, NOTE_E2, 8, NOTE_D3, 8, NOTE_E2, 8, NOTE_E2, 8,
 		 NOTE_B3, -16, NOTE_G3, -16, NOTE_E3, -16, NOTE_B2, -16, NOTE_E3, -16, NOTE_G3, -16, NOTE_C4, -16, NOTE_B3, -16, NOTE_G3, -16, NOTE_B3, -16, NOTE_G3, -16, NOTE_E3, -16,
-	};
 
-song doom = { .name = "Doom",
-	.tempo = 225,
-	.melody = melody_arr,
-	.notes = sizeof(melody_arr) / sizeof(melody_arr[0]) / 2
 };
 
 #endif

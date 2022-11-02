@@ -3,7 +3,7 @@
 
 #include "songs.h"
 
-int melody_arr[250] = {
+int melody_gameofthrones[] = {
 
 	// Game of Thrones
 	// Score available at https://musescore.com/user/8407786/scores/2156716
@@ -54,12 +54,7 @@ int melody_arr[250] = {
 	
 	REST,4, NOTE_GS5,16, NOTE_AS5,16, NOTE_C6,8, NOTE_G5,8, NOTE_GS5,16, NOTE_AS5,16,
 	NOTE_C6,8, NOTE_G5,16, NOTE_GS5,16, NOTE_AS5,16, NOTE_C6,8, NOTE_G5,8, NOTE_GS5,16, NOTE_AS5,16
-};
 
-song gameofthrones = { .name = "GOT Theme",
-	.tempo = 85,
-	.melody = melody_arr,
-	.notes = sizeof(melody_arr) / sizeof(melody_arr[0]) / 2
 };
 
 #endif

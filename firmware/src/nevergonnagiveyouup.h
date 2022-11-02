@@ -3,7 +3,7 @@
 
 #include "songs.h"
 
-int melody_arr[250] = {
+int melody_nevergonnagiveyouup[] = {
 
 	// Never Gonna Give You Up - Rick Astley
 	// Score available at https://musescore.com/chlorondria_5/never-gonna-give-you-up_alto-sax
@@ -75,12 +75,7 @@ int melody_arr[250] = {
 	NOTE_D5,4, NOTE_E5,8, NOTE_CS5,-8, NOTE_B4,16, NOTE_A4,4, NOTE_A4,8,
 
 	NOTE_E5,4, NOTE_D5,2, REST,4
-};
-
-song nevergonnagiveyouup = { .name = "Rick Roll ",
-	.tempo = 114,
-	.melody = melody_arr,
-	.notes = sizeof(melody_arr) / sizeof(melody_arr[0]) / 2
+	
 };
 
 #endif

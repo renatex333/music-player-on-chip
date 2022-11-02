@@ -3,7 +3,7 @@
 
 #include "songs.h"
 
-int melody_arr[250] =  {
+int melody_starwars[] = {
 
 	// Dart Vader theme (Imperial March) - Star wars
 	// Score available at https://musescore.com/user/202909/scores/1141521
@@ -29,12 +29,6 @@ int melody_arr[250] =  {
 	NOTE_F6,4, NOTE_DS6,8, NOTE_CS6,4, NOTE_C6,8, NOTE_AS5,4, NOTE_GS5,8, NOTE_G5,4, NOTE_F5,8,
 	NOTE_C6,1
 	
-};
-
-song starwars = {	.name = "Star Wars",
-	.tempo = 108,
-	.melody = melody_arr,
-	.notes = sizeof(melody_arr) / sizeof(melody_arr[0]) / 2
 };
 
 #endif

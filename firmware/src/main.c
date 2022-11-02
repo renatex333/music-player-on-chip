@@ -1,4 +1,5 @@
 #include <asf.h>
+#include <string.h>
 
 
 //Inclui o arquivo Header Songs, que contem o struct e define das notas
@@ -44,7 +45,7 @@ volatile char play_flag;
 volatile char selecao_flag;
 volatile char stopped_flag;
 
-char songname[10];
+char songname[12];
 
 /************************************************************************/
 /* handler / callbacks                                                  */
@@ -119,7 +120,7 @@ void tone(int freq, int time){
 		//recebe em milisegundos e multiplica por 1000 para converter para microsegundos
 		delay_us(time*1000);
 	} else {
-		double duracao = (time*freq)/(1000);
+		double duracao = (time*freq)/(100);
 		if(time >= 900){
 			pio_clear(LED3_PIO, LED3_PIO_IDX_MASK);
 		} else if(time < 900 && time > 400){
@@ -136,12 +137,9 @@ void tone(int freq, int time){
 	}
 }
 
-void playsong(song now_playing){
+void playsong(Song *now_playing){
 		// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 		// there are two values per note (pitch and duration), so for each note there are four bytes
-
-		// this calculates the duration of a whole note in ms
-		int wholenote = (60000 * 4) / now_playing.tempo;
 
 		int divider = 0;
 
@@ -149,10 +147,11 @@ void playsong(song now_playing){
 		
 		// iterate over the notes of the melody.
 		// Remember, the array is twice the number of notes (notes + durations)
-		for (int thisNote = 0; thisNote < now_playing.notes * 2; thisNote = thisNote + 2) {
+		for (int thisNote = 0; thisNote < ((*now_playing).notes) * 2; thisNote = thisNote + 2) {
 			if(selecao_flag){
 				 return;
 			}
+			
 			if(stop_flag){
 				pio_set(LED1_PIO, LED1_PIO_IDX_MASK);
 				pio_set(LED2_PIO, LED2_PIO_IDX_MASK);
@@ -162,22 +161,37 @@ void playsong(song now_playing){
 			}
 			
 			// calculates the duration of each note
-			divider = now_playing.melody[thisNote + 1];
-			noteDuration = (wholenote) / abs(divider);
+			divider = (*now_playing).melody[thisNote + 1];
+			
+			noteDuration = ((*now_playing).wholenote) / abs(divider);
 			if (divider < 0) {
 				noteDuration *= 1.5; // increases the duration in half for dotted notes
 			}
 			
-			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone(now_playing.melody[thisNote], noteDuration);
-			
+			if ((*now_playing).melody[thisNote] == 0){
+				// Wait for the specief duration before playing the next note.
+				delay_ms(noteDuration);
+			} else {
+				// we only play the note for 90% of the duration, leaving 10% as a pause
+				tone((*now_playing).melody[thisNote], noteDuration * 0.9);
+				// Wait for the specified duration before playing the next note.
+				delay_ms(noteDuration * 0.4);
+			}
 			
 			pio_set(LED3_PIO, LED3_PIO_IDX_MASK);
 			pio_set(LED2_PIO, LED2_PIO_IDX_MASK);
 			pio_set(LED1_PIO, LED1_PIO_IDX_MASK);
-
-			delay_us(30000);
+			
 		}
+		delay_ms(100);
+}
+
+void init_songs(Song *song, char name[12], int tempo, int *melody_array, int size_array, int size_array_element){
+	strcpy(song->name, name);
+	song->tempo = tempo;
+	song->melody = &melody_array[0];
+	song->wholenote = (6000 * 4)/(song->tempo);
+	song->notes = size_array / size_array_element / 2;
 }
 
 
@@ -255,9 +269,24 @@ int main (void)
 	init();
 	gfx_mono_ssd1306_init();
 	
-	song selecao_musicas[6] = {jigglypuff, nevergonnagiveyouup, gameofthrones, zelda, doom, starwars};
-	int i = 0; // Index para seleção das músicas do array
+	Song jigglypuff;
+	Song nevergonnagiveyouup;
+	Song gameofthrones;
+	Song zelda;
+	Song doom;
+	Song starwars;
 	
+	// Cria um array de pointers para as structs das músicas para otimizar o uso de memória
+	Song *selecao_musicas[6] = {&jigglypuff, &nevergonnagiveyouup, &gameofthrones, &zelda, &doom, &starwars};
+		
+	init_songs(&jigglypuff, "Jigglypuff", 85, melody_jigglypuff, sizeof(melody_jigglypuff), sizeof(melody_jigglypuff[0]));
+	init_songs(&nevergonnagiveyouup, "Rick Roll ", 114, melody_nevergonnagiveyouup, sizeof(melody_nevergonnagiveyouup), sizeof(melody_nevergonnagiveyouup[0]));
+	init_songs(&gameofthrones, "GOT Theme", 85, melody_gameofthrones, sizeof(melody_gameofthrones), sizeof(melody_gameofthrones[0]));
+	init_songs(&zelda, "Zelda", 88, melody_zelda, sizeof(melody_zelda), sizeof(melody_zelda[0]));
+	init_songs(&doom, "Doom", 225, melody_doom, sizeof(melody_doom), sizeof(melody_doom[0]));
+	init_songs(&starwars, "StarWars", 108, melody_starwars, sizeof(melody_starwars), sizeof(melody_starwars[0]));
+	
+	int i = 0; // Index para seleção das músicas do array
 	while(1) {
 		if(selecao_flag){
 			selecao_flag = 0;
@@ -267,7 +296,7 @@ int main (void)
 			}
 			gfx_mono_draw_string("               ", 0, 0, &sysfont);
 		}
-		sprintf(songname, "%s", selecao_musicas[i].name);
+		sprintf(songname, "%s", selecao_musicas[i]->name);
 		gfx_mono_draw_string(songname, 0, 0, &sysfont);
 		playsong(selecao_musicas[i]);		
 	}
