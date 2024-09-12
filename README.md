@@ -1,9 +1,10 @@
-# Music Player - APS 1
-Made By: Renato Falcão & Matheus Barros
+# Music Player
+
+Authors: Renato Falcão & Matheus Barros
 
 ## Documentation 
 
-This was made as a project for the class "Computação Embarcado" - Insper, and it consists of making a Music Player using the Atmel SAME70-XPLD.
+This was made as a project for the class "Computação Embarcada" - Insper, and it consists of making a Music Player using the Atmel SAME70-XPLD.
 
 For more information access:
 
@@ -56,11 +57,11 @@ They are in this order:
 - [Doom](https://github.com/robsoncouto/arduino-songs/blob/master/doom/doom.ino)
 - [Star Wars](https://github.com/robsoncouto/arduino-songs/blob/master/starwars/starwars.ino)
 
-### Estruturação do código
+### Code Structure
 
-O código foi estruturado nos seguintes arquivos:
+The code was organized into the following files:
 
-- `Songs.h` &rarr; arquivo no qual foram definidas as notas com suas respectivas durações.
-- `defines.h` &rarr; arquivo no qual foram definidos os pinos dedicados a cada periférico, como o buzzer, botões e leds.
-- `jigglypuff.h`, `nevergonnagiveyouup.h`, `gameofthrones.h`, `zelda.h`, `doom.h`, `starwars.h` &rarr; arquivos nos quais foram definidos os arrays com as melodias das músicas.
-- `main.c` &rarr; arquivo com todas as funções necessárias para a execução do software. Nele são encontrados funções de inicialização dos periféricos e das structs de cada música, funções de callback que lidam com a mudança de estados das flags com o apertar dos botões, funções que retornam os estados de deteerminados pinos, funções que ativam ou desativam o pino que liga o buzzer, além das funções principais que controlam o buzzer para que ele ligue/desligue nas durações determinadas e, desta forma, tocar a música desejada.
+- `Songs.h` &rarr; file where the notes and their respective durations were defined.
+- `defines.h` &rarr; file where the pins assigned to each peripheral, such as the buzzer, buttons, and LEDs, were defined.
+- `jigglypuff.h`, `nevergonnagiveyouup.h`, `gameofthrones.h`, `zelda.h`, `doom.h`, `starwars.h` &rarr; files where the arrays with the melodies of the songs were defined.
+- `main.c` &rarr; file containing all the necessary functions for the software's execution. This includes functions for initializing peripherals and the structs for each song, callback functions that handle state changes of the flags when buttons are pressed, functions that return the states of certain pins, functions that activate or deactivate the pin controlling the buzzer, as well as the main functions that control the buzzer to turn on/off for the specified durations, thus playing the desired song.
